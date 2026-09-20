@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kartei</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --bg:#EEF4FF; --surface:#FFFFFF; --ink:#1F2547; --muted:#5B6690; --line:#D9E3F8;
+  --accent:#5468FF; --accent-soft:#E6EAFF; --on-accent:#FFFFFF;
+  --paper:#FFFEFA; --rule:#D8E8FF; --margin:#FF8A9A;
+  --ok:#4FD69B; --ok-ink:#0C6A42; --ok-bg:#D9F7E8;
+  --mid:#FFC93C; --mid-ink:#7A4E00; --mid-bg:#FFF0C2;
+  --bad:#FF7B7B; --bad-ink:#A62626; --bad-bg:#FFE1E1;
+  --danger:#D63C42;
+  --none-bg:#E3EAF8; --none-ink:#43506C;
+  --lh:30px;
+  --round:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:8px max(16px,env(safe-area-inset-right,0px)) 56px max(16px,env(safe-area-inset-left,0px))}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+h1{font:750 30px/1.15 var(--round);letter-spacing:-.02em;margin:6px 0 14px;overflow-wrap:anywhere}
+.brand{display:flex;align-items:center;gap:10px}
+h1:focus{outline:none}
+h2{font:650 17px/1.3 var(--round);margin:26px 0 10px}
+.lead{margin:-8px 0 8px;color:var(--muted)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Buttons */
+.btn{min-height:48px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.ghost{background:transparent}
+.btn.small{min-height:40px;padding:0 14px;font-size:15px}
+.btn.wide{width:100%;min-height:54px;font-size:17px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.icon-btn{width:44px;height:44px;flex:none;border-radius:12px;border:1px solid transparent;background:transparent;display:inline-grid;place-items:center;color:var(--muted)}
+.icon-btn.accent{background:var(--accent);color:var(--on-accent)}
+.icon-btn.outline{border-color:var(--line);background:var(--surface);color:var(--ink)}
+.icon-btn:disabled{opacity:.35}
+@media (hover:hover){
+  .icon-btn.danger:hover{color:var(--bad-ink);background:var(--bad-bg)}
+  .icon-btn:not(.accent):not(.danger):not(:disabled):hover{background:var(--none-bg)}
+  .btn:not(.primary):not(.danger):not(:disabled):hover{border-color:var(--accent)}
+}
+.top-row{display:flex;align-items:center;justify-content:space-between;min-height:44px;gap:8px}
+.actions{display:flex;gap:6px;align-items:center}
+.backbtn{display:inline-flex;align-items:center;gap:2px;height:44px;padding:0 10px 0 0;border:0;background:none;color:var(--accent);font-weight:600}
+.count{color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* Listen */
+.tiles,.clist,.rlist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.tile{display:flex;align-items:stretch;background:hsl(var(--h) 100% 96%);border:1.5px solid hsl(var(--h) 75% 86%);border-radius:18px}
+.tile-main{flex:1;min-width:0;text-align:left;background:none;border:0;padding:12px 6px 12px 12px;display:flex;gap:14px;align-items:center;border-radius:18px}
+.tile-av{width:48px;height:48px;flex:none;border-radius:14px;display:grid;place-items:center;font:700 22px var(--round);background:hsl(var(--h) 90% 82%);color:hsl(var(--h) 60% 24%)}
+.tile-body{display:grid;gap:4px;min-width:0;flex:1}
+.tile>.icon-btn{align-self:center;margin-right:6px}
+.tile-name{font:700 19px/1.25 var(--round);overflow-wrap:anywhere}
+.tile-meta{color:var(--muted);font-size:14px}
+.bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--none-bg);margin-top:6px}
+.bar i{display:block;height:100%}
+.bar .b-ok{background:var(--ok)}.bar .b-mid{background:var(--mid)}.bar .b-bad{background:var(--bad)}
+.crow{display:flex;align-items:stretch;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.crow-main{flex:1;min-width:0;display:flex;gap:12px;align-items:flex-start;text-align:left;background:none;border:0;padding:12px 6px 12px 14px;border-radius:14px}
+.crow>.icon-btn{align-self:center;margin-right:6px}
+.crow-text{display:grid;gap:2px;min-width:0}
+.crow-q{font-weight:600;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.crow-a{color:var(--muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;margin-top:6px;background:var(--none-bg);border:2px solid var(--muted)}
+.dot.s-richtig{background:var(--ok);border-color:var(--ok)}
+.dot.s-mittel{background:var(--mid);border-color:var(--mid)}
+.dot.s-falsch{background:var(--bad);border-color:var(--bad)}
+.empty-state{padding:28px 18px;border:2px dashed #B9C6FF;border-radius:18px;text-align:center;color:var(--muted);background:rgba(255,255,255,.6)}
+.empty-state p{margin:0 0 14px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:600;background:var(--none-bg);color:var(--none-ink)}
+.badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.badge.s-richtig{background:var(--ok-bg);color:var(--ok-ink)}
+.badge.s-mittel{background:var(--mid-bg);color:var(--mid-ink)}
+.badge.s-falsch{background:var(--bad-bg);color:var(--bad-ink)}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.row-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
+.banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;margin:0 0 16px;border-radius:14px;background:var(--surface);border:1px solid var(--accent)}
+.banner p{margin:0;flex:1 1 200px;overflow-wrap:anywhere}
+.banner-actions{display:flex;gap:8px}
+
+/* Formularelemente */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.seg{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.seg button{min-height:52px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);text-align:left;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.seg button small{color:var(--muted);font-weight:500;font-size:14px}
+.seg button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.seg button:disabled{opacity:.4}
+.count-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.count-val{text-align:center;font-variant-numeric:tabular-nums}
+.count-val output{display:block;font:750 44px/1 var(--round);letter-spacing:-.02em}
+.count-val span{color:var(--muted);font-size:14px}
+input[type=range]{width:100%;height:32px;accent-color:var(--accent);margin:4px 0 10px}
+.switch-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px}
+.switch-row small{display:block;color:var(--muted)}
+input[type=checkbox][role=switch]{-webkit-appearance:none;appearance:none;width:52px;height:32px;border-radius:16px;background:var(--line);position:relative;flex:none;cursor:pointer;transition:background .2s;margin:0}
+input[type=checkbox][role=switch]::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+input[type=checkbox][role=switch]:checked{background:var(--accent)}
+input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
+.hint{color:var(--muted);font-size:14px;margin:10px 0 0;text-align:center;min-height:1.4em}
+.kbd-hint{display:none;color:var(--muted);font-size:13px;margin:6px 0 0;text-align:center}
+@media (hover:hover) and (pointer:fine){.kbd-hint{display:block}}
+
+/* Prüfung: Karteikarte */
+.prog{height:6px;border-radius:3px;background:var(--none-bg);overflow:hidden;margin:6px 0 4px}
+.prog i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.flip{perspective:1600px;margin-top:16px}
+.flip-inner{display:grid;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+.is-flipped .flip-inner{transform:rotateY(180deg)}
+.face{grid-area:1/1;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:var(--paper);border-radius:8px;box-shadow:0 1px 1px rgba(0,0,0,.12),0 16px 32px -16px rgba(20,30,70,.5);display:flex;flex-direction:column;min-width:0}
+.face.back{transform:rotateY(180deg)}
+.face[inert]{pointer-events:none}
+.face-head{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px;background:hsl(var(--h,225) 100% 95%);border-radius:8px 8px 0 0;border-bottom:2px solid var(--margin);font-weight:600;font-size:14px;color:var(--muted)}
+.face-head span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.face-body{flex:1;padding:0 20px;min-height:calc(var(--lh)*9);border-radius:0 0 8px 8px;font:17px/var(--lh) ui-serif,"New York","Iowan Old Style",Georgia,serif;background:linear-gradient(to bottom,transparent calc(var(--lh) - 1px),var(--rule) calc(var(--lh) - 1px)) 0 0/100% var(--lh) repeat-y}
+.face-body p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.face-body:focus-within{box-shadow:inset 3px 0 0 var(--accent)}
+.q{font-weight:600;margin-bottom:var(--lh)!important}
+.face-body textarea{display:block;width:100%;padding:0;margin:0;border:0;outline:0;background:transparent;resize:none;overflow:hidden;font:inherit;min-height:calc(var(--lh)*4)}
+.face-body textarea::placeholder{color:var(--muted);opacity:.8}
+.cmp{display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
+.cmp h3{margin:0;font:600 14px/var(--lh) -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color:var(--muted)}
+.cmp p.empty{color:var(--muted);font-style:italic}
+@media (max-width:519px){
+  .cmp{grid-template-columns:1fr}
+  .cmp>div+div{margin-top:var(--lh)}
+}
+.rate-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.rate-btn{min-height:58px;border-radius:16px;border:0;font:700 17px var(--round)}
+.rate-btn.s-richtig{background:var(--ok);color:#06331F}
+.rate-btn.s-mittel{background:var(--mid);color:#3A2600}
+.rate-btn.s-falsch{background:var(--bad);color:#4A0A0A}
+.rate-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* Ergebnis */
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+.stat{border-radius:14px;padding:12px 8px;text-align:center;font-weight:600}
+.stat b{display:block;font:750 32px/1.1 var(--round);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat.s-richtig{background:var(--ok-bg);color:var(--ok-ink)}
+.stat.s-mittel{background:var(--mid-bg);color:var(--mid-ink)}
+.stat.s-falsch{background:var(--bad-bg);color:var(--bad-ink)}
+.ri{background:var(--surface);border:1px solid var(--line);border-left-width:6px;border-radius:14px;padding:14px 16px}
+.ri.s-richtig{border-left-color:var(--ok)}.ri.s-mittel{border-left-color:var(--mid)}.ri.s-falsch{border-left-color:var(--bad)}
+.ri-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:var(--muted);font-size:14px}
+.ri-q{margin:0 0 10px;font-weight:650;white-space:pre-wrap;overflow-wrap:anywhere}
+.ri .cmp{gap:10px 22px}
+.ri .cmp h3{font:600 13px/1.4 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--muted);margin-bottom:2px}
+.ri .cmp p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.ri .cmp p.empty{color:var(--muted);font-style:italic}
+.ri .cmp>div+div{margin-top:0}
+@media (max-width:519px){.ri .cmp>div+div{margin-top:4px}}
+.retest{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}
+
+/* Dialog */
+.overlay{position:fixed;top:0;bottom:0;left:0;right:0;z-index:50;display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;background:rgba(60,75,150,.32);padding:calc(env(safe-area-inset-top,0px) + 5vh) 12px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.sheet{width:100%;max-width:520px;background:var(--surface);border-radius:20px;padding:16px 18px 18px;box-shadow:0 20px 50px -10px rgba(40,50,110,.35)}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sheet h2{margin:0;font-size:20px}
+.sheet p{margin:0 0 14px}
+.field{display:grid;gap:6px;margin:0 0 14px;font-weight:600;font-size:15px}
+.field input,.field textarea,.sheet textarea{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);font-size:17px;font-weight:400;resize:vertical}
+.sheet hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+.sheet-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+.err{color:var(--bad-ink);min-height:1.4em;margin:0 0 8px!important;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:15px;max-width:calc(100% - 32px);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){
+  .flip-inner,.toast,input[type=checkbox][role=switch],input[type=checkbox][role=switch]::after{transition:none}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<noscript>Diese App braucht JavaScript.</noscript>
+<script>
+(function(){
+'use strict';
+
+/* ---------- Grundlagen ---------- */
+var KEY='kartei-app-v1', LH=30;
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var esc=function(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)};
+var plural=function(n,one,many){return n+' '+(n===1?one:many)};
+var STATUS={richtig:'Richtig',mittel:'Mittel',falsch:'Falsch'};
+var root=$('#app'), mroot=$('#modal-root');
+
+var ICON={
+  plus:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  minus:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5"/></svg>',
+  back:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>',
+  x:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  backup:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M8 11l4 4 4-4M5 20h14"/></svg>'
+};
+
+/* ---------- Daten & Speicher ---------- */
+function normalize(s){
+  s=s||{};
+  s.folders=(Array.isArray(s.folders)?s.folders:[]).filter(function(f){return f&&typeof f.name==='string'}).map(function(f){
+    return {id:f.id||uid(),name:f.name,cards:(Array.isArray(f.cards)?f.cards:[]).filter(function(c){return c&&typeof c.q==='string'}).map(function(c){
+      return {id:c.id||uid(),q:c.q,a:String(c.a==null?'':c.a),s:(c.s==='richtig'||c.s==='mittel'||c.s==='falsch')?c.s:null};
+    })};
+  });
+  s.session=(s.session&&Array.isArray(s.session.ids)&&s.session.res)?s.session:null;
+  var p=s.prefs||{};
+  s.prefs={pool:p.pool||'all',count:+p.count>0?+p.count:10,shuffle:p.shuffle!==false};
+  return s;
+}
+function load(){
+  try{var raw=localStorage.getItem(KEY); if(raw){return normalize(JSON.parse(raw));}}catch(e){}
+  return normalize({});
+}
+var state=load(), view={name:'home'}, storageWarned=false, saveTimer=null, modalCtx=null, lastFocus=null, toastTimer=null;
+
+function save(){
+  clearTimeout(saveTimer); saveTimer=null;
+  try{localStorage.setItem(KEY,JSON.stringify(state));}
+  catch(e){ if(!storageWarned){storageWarned=true;toast('Speichern im Browser nicht möglich. Deine Karten bleiben nur bis zum Schließen erhalten.');} }
+}
+function saveSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(save,300);}
+window.addEventListener('pagehide',function(){if(saveTimer)save();});
+document.addEventListener('visibilitychange',function(){if(document.hidden&&saveTimer)save();});
+
+function toast(msg){
+  var t=$('#toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.classList.remove('show')},2400);
+}
+
+/* ---------- Hilfsfunktionen ---------- */
+function getFolder(id){return state.folders.find(function(f){return f.id===id})}
+function shuffled(a){var r=a.slice();for(var i=r.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=r[i];r[i]=r[j];r[j]=t;}return r}
+function initial(n){return (Array.from(n.trim())[0]||'?').toUpperCase()}
+function hue(name){var h=0;for(var i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))%360;return h}
+function counts(cards){var c={richtig:0,mittel:0,falsch:0,neu:0};cards.forEach(function(x){c[x.s||'neu']++});return c}
+function bar(cards){
+  var n=cards.length; if(!n) return '';
+  var c=counts(cards), w=function(k){return (c[k]/n*100).toFixed(2)};
+  return '<div class="bar" role="img" aria-label="'+c.richtig+' richtig, '+c.mittel+' mittel, '+c.falsch+' falsch, '+c.neu+' offen"><i class="b-ok" style="width:'+w('richtig')+'%"></i><i class="b-mid" style="width:'+w('mittel')+'%"></i><i class="b-bad" style="width:'+w('falsch')+'%"></i></div>';
+}
+function poolCards(f,p){
+  var c=f.cards;
+  if(p==='schwach') return c.filter(function(x){return x.s==='mittel'||x.s==='falsch'});
+  if(p==='falsch') return c.filter(function(x){return x.s==='falsch'});
+  if(p==='neu') return c.filter(function(x){return !x.s});
+  return c;
+}
+function effCount(max){return max<1?0:Math.max(1,Math.min(state.prefs.count,max));}
+function sanitizeSession(){
+  var s=state.session; if(!s) return;
+  var f=getFolder(s.folderId);
+  if(!f){state.session=null;return;}
+  if(s.done) return;
+  var keep=[],ni=0;
+  s.ids.forEach(function(id,idx){if(f.cards.some(function(c){return c.id===id})){keep.push(id);if(idx<s.i)ni++;}});
+  s.ids=keep; s.i=ni;
+  if(!keep.length) state.session=null;
+  else if(s.i>=keep.length) s.done=true;
+}
+sanitizeSession();
+
+/* ---------- Navigation & Rendering ---------- */
+function go(v){
+  view=v; render(); window.scrollTo(0,0);
+  var h=$('h1'); if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}
+}
+function topRow(back,label,actions){
+  return '<div class="top-row">'+(back?'<button class="backbtn" data-a="'+back+'">'+ICON.back+esc(label)+'</button>':'<span></span>')+'<div class="actions">'+(actions||'')+'</div></div>';
+}
+function render(){
+  if(view.name==='folder'&&!getFolder(view.id)) view={name:'home'};
+  if(view.name==='setup'&&!getFolder(view.id)) view={name:'home'};
+  if(view.name==='test'){
+    if(!state.session) view={name:'home'};
+    else if(state.session.done) view={name:'review'};
+  }
+  if(view.name==='review'&&!state.session) view={name:'home'};
+  var html='';
+  if(view.name==='home') html=viewHome();
+  else if(view.name==='folder') html=viewFolder();
+  else if(view.name==='setup') html=viewSetup();
+  else if(view.name==='test') html=viewTest();
+  else if(view.name==='review') html=viewReview();
+  root.innerHTML='<div class="wrap">'+html+'</div>';
+  if(view.name==='test') mountTest();
+  if(view.name==='setup') mountSetup();
+}
+
+function bannerHtml(){
+  var s=state.session; if(!s) return '';
+  var fn=esc(s.folderName||'Ordner');
+  if(s.done) return '<div class="banner"><p>Ergebnis der letzten Prüfung in „'+fn+'“</p><div class="banner-actions"><button class="btn small primary" data-a="view-result">Ansehen</button><button class="btn small ghost" data-a="discard-session">Verwerfen</button></div></div>';
+  return '<div class="banner"><p>Prüfung in „'+fn+'“ läuft, Frage '+(s.i+1)+' von '+s.ids.length+'</p><div class="banner-actions"><button class="btn small primary" data-a="resume-session">Fortsetzen</button><button class="btn small ghost" data-a="discard-session">Verwerfen</button></div></div>';
+}
+
+/* ---------- Ansicht: Ordner ---------- */
+function viewHome(){
+  var list=state.folders.length
+    ?'<ul class="tiles">'+state.folders.map(function(f){
+        var n=f.cards.length;
+        return '<li class="tile" style="--h:'+hue(f.name)+'"><button class="tile-main" data-a="open-folder" data-id="'+f.id+'"><span class="tile-av" aria-hidden="true">'+esc(initial(f.name))+'</span><span class="tile-body"><span class="tile-name">'+esc(f.name)+'</span><span class="tile-meta">'+plural(n,'Karte','Karten')+'</span>'+bar(f.cards)+'</span></button><button class="icon-btn danger" data-a="del-folder" data-id="'+f.id+'" aria-label="Ordner '+esc(f.name)+' löschen">'+ICON.trash+'</button></li>';
+      }).join('')+'</ul>'
+    :'<div class="empty-state"><p>Noch kein Ordner. Lege einen Ordner an, zum Beispiel „Biologie“, und schreibe dann deine Karten hinein.</p><button class="btn primary" data-a="new-folder">Ordner anlegen</button></div>';
+  return topRow('','', '<button class="icon-btn outline" data-a="backup" aria-label="Sicherung und Übertragung">'+ICON.backup+'</button><button class="icon-btn accent" data-a="new-folder" aria-label="Neuen Ordner anlegen">'+ICON.plus+'</button>')
+    +'<h1 class="brand"><svg viewBox="0 0 44 44" width="42" height="42" aria-hidden="true"><rect x="3" y="9" width="26" height="30" rx="6" fill="#FFC93C" transform="rotate(-12 16 24)"/><rect x="9" y="5" width="26" height="30" rx="6" fill="#4FD69B" transform="rotate(5 22 20)"/><rect x="14" y="8" width="26" height="30" rx="6" fill="#fff" stroke="#5468FF" stroke-width="2.5"/><path d="M19 17h16M19 23h16M19 29h10" stroke="#8FB4FF" stroke-width="2.2" stroke-linecap="round"/></svg>Kartei</h1>'+bannerHtml()+list;
+}
+
+/* ---------- Ansicht: Karten im Ordner ---------- */
+function viewFolder(){
+  var f=getFolder(view.id), n=f.cards.length, c=counts(f.cards);
+  var banner=(state.session&&state.session.folderId===f.id)?bannerHtml():'';
+  var rated=n-c.neu;
+  var list=n
+    ?'<ul class="clist">'+f.cards.map(function(x){
+        return '<li class="crow"><button class="crow-main" data-a="edit-card" data-id="'+x.id+'"><span class="dot s-'+(x.s||'none')+'" aria-hidden="true"></span><span class="crow-text"><span class="crow-q">'+esc(x.q)+'</span><span class="crow-a">'+esc(x.a)+'</span><span class="sr-only">'+(x.s?STATUS[x.s]:'Noch nicht geprüft')+'</span></span></button><button class="icon-btn danger" data-a="del-card" data-id="'+x.id+'" aria-label="Karte löschen: '+esc(x.q.slice(0,60))+'">'+ICON.trash+'</button></li>';
+      }).join('')+'</ul>'
+    :'<div class="empty-state"><p>Noch keine Karten. Tippe auf +, schreibe die Frage und die Lösung, fertig.</p><button class="btn primary" data-a="new-card">Erste Karte anlegen</button></div>';
+  return topRow('home','Ordner','<button class="icon-btn accent" data-a="new-card" aria-label="Neue Karte hinzufügen">'+ICON.plus+'</button>')
+    +'<h1>'+esc(f.name)+'</h1>'+banner
+    +'<div class="badges"><span class="badge s-richtig">Richtig '+c.richtig+'</span><span class="badge s-mittel">Mittel '+c.mittel+'</span><span class="badge s-falsch">Falsch '+c.falsch+'</span><span class="badge">Offen '+c.neu+'</span></div>'
+    +'<div class="row-actions"><button class="btn primary" data-a="setup"'+(n?'':' disabled')+'>Prüfung starten</button><button class="btn ghost" data-a="reset-status"'+(rated?'':' disabled')+'>Status zurücksetzen</button></div>'
+    +list;
+}
+
+/* ---------- Ansicht: Prüfung einrichten ---------- */
+function viewSetup(){
+  var f=getFolder(view.id), p=state.prefs;
+  var pools=[['all','Alle Karten'],['schwach','Mittel und falsch'],['falsch','Nur falsch'],['neu','Noch nicht geprüft']];
+  var list=poolCards(f,p.pool), max=list.length, cnt=effCount(max);
+  var seg=pools.map(function(x){
+    var n=poolCards(f,x[0]).length;
+    return '<button data-a="pool" data-p="'+x[0]+'" aria-pressed="'+(p.pool===x[0])+'"'+(n?'':' disabled')+'>'+x[1]+'<small>'+n+'</small></button>';
+  }).join('');
+  var note=(state.session&&!state.session.done)?'<p class="hint">Die laufende Prüfung wird durch diese ersetzt.</p>':'';
+  return topRow('back-folder','Ordner')
+    +'<h1>Prüfung starten</h1><p class="lead">'+esc(f.name)+'</p>'
+    +'<h2>Welche Karten?</h2><div class="seg">'+seg+'</div>'
+    +'<h2>Wie viele Fragen?</h2><div class="panel">'
+      +'<div class="count-row"><button class="icon-btn outline" data-a="step" data-d="-1" aria-label="Eine Frage weniger"'+(max<2?' disabled':'')+'>'+ICON.minus+'</button>'
+      +'<div class="count-val"><output id="cnt-out" for="cnt">'+cnt+'</output><span>von '+max+' Karten</span></div>'
+      +'<button class="icon-btn outline" data-a="step" data-d="1" aria-label="Eine Frage mehr"'+(max<2?' disabled':'')+'>'+ICON.plus+'</button></div>'
+      +'<input type="range" id="cnt" min="1" max="'+Math.max(1,max)+'" value="'+Math.max(1,cnt)+'" aria-label="Anzahl der Fragen"'+(max<2?' disabled':'')+'>'
+      +'<button class="btn small ghost" data-a="all-count"'+(max<2?' disabled':'')+'>Alle '+max+' Fragen</button></div>'
+    +'<div class="panel" style="margin-top:10px"><label class="switch-row"><span>Fragen mischen<small>Zufällige Reihenfolge und zufällige Auswahl</small></span><input type="checkbox" role="switch" id="shuf" '+(p.shuffle?'checked':'')+'></label></div>'
+    +'<div style="margin-top:18px"><button class="btn primary wide" id="start-btn" data-a="start"'+(max?'':' disabled')+'>'+(max?'Prüfung mit '+plural(cnt,'Frage','Fragen')+' starten':'Keine Karten in dieser Auswahl')+'</button>'+note+'</div>';
+}
+function updateCount(){
+  var f=getFolder(view.id); if(!f) return;
+  var max=poolCards(f,state.prefs.pool).length, c=effCount(max);
+  var r=$('#cnt'); if(r) r.value=Math.max(1,c);
+  var o=$('#cnt-out'); if(o) o.textContent=c;
+  var b=$('#start-btn'); if(b&&max) b.textContent='Prüfung mit '+plural(c,'Frage','Fragen')+' starten';
+}
+function mountSetup(){
+  var r=$('#cnt'); if(!r) return;
+  r.addEventListener('input',function(){state.prefs.count=+r.value;updateCount();saveSoon();});
+}
+
+/* ---------- Ansicht: Prüfung ---------- */
+function viewTest(){
+  var s=state.session, f=getFolder(s.folderId);
+  var id=s.ids[s.i], c=f.cards.find(function(x){return x.id===id}), total=s.ids.length;
+  var fl=!!s.flipped;
+  return topRow('pause','Pausieren','<span class="count">Frage '+(s.i+1)+' von '+total+'</span>')
+    +'<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+s.i+'"><i style="width:'+(s.i/total*100)+'%"></i></div>'
+    +'<div class="flip'+(fl?' is-flipped':'')+'" id="flip" style="--h:'+hue(f.name)+'"><div class="flip-inner">'
+      +'<section class="face front" aria-label="Vorderseite"'+(fl?' inert aria-hidden="true"':'')+'>'
+        +'<div class="face-head"><span>Frage</span><span>'+esc(f.name)+'</span></div>'
+        +'<div class="face-body"><p class="q">'+esc(c.q)+'</p><label class="sr-only" for="own">Deine Antwort</label><textarea id="own" placeholder="Schreibe deine Antwort …" autocapitalize="sentences"></textarea></div>'
+      +'</section>'
+      +'<section class="face back" aria-label="Rückseite"'+(fl?'':' inert aria-hidden="true"')+'>'
+        +'<div class="face-head"><span>Lösung</span><span>'+esc(f.name)+'</span></div>'
+        +'<div class="face-body"><p class="q">'+esc(c.q)+'</p><div class="cmp"><div><h3>Richtige Antwort</h3><p>'+esc(c.a)+'</p></div><div><h3>Deine Antwort</h3><p id="own-view"></p></div></div></div>'
+      +'</section>'
+    +'</div></div>'
+    +'<button class="btn primary wide" id="flipbtn" data-a="flip" style="margin-top:16px">'+(fl?'Zurückdrehen':'Umdrehen')+'</button>'
+    +'<div class="rate-row" role="group" aria-label="Wie gut wusstest du es?">'
+      +['richtig','mittel','falsch'].map(function(k){return '<button class="rate-btn s-'+k+'" data-a="rate" data-s="'+k+'"'+(fl?'':' disabled')+'>'+STATUS[k]+'</button>'}).join('')
+    +'</div>'
+    +'<p class="hint" id="rate-hint">'+(fl?'':'Erst umdrehen, dann bewerten.')+'</p>'
+    +'<p class="kbd-hint">Tipp: ⌘ oder Strg + Enter dreht die Karte, danach bewerten die Tasten 1, 2 und 3.</p>';
+}
+function grow(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.max(LH*4,Math.ceil(ta.scrollHeight/LH)*LH)+'px';
+}
+function setOwnView(){
+  var s=state.session, ov=$('#own-view'); if(!ov) return;
+  var t=(s.draft||'').trim();
+  ov.textContent=t||'Nichts eingegeben';
+  ov.className=t?'':'empty';
+}
+function mountTest(){
+  var s=state.session, ta=$('#own');
+  ta.value=s.draft||''; grow(ta); setOwnView();
+  ta.addEventListener('input',function(){s.draft=ta.value;grow(ta);saveSoon();});
+  ta.addEventListener('keydown',function(e){if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){e.preventDefault();flip();}});
+  if(!s.flipped){try{ta.focus({preventScroll:true});}catch(e){}}
+}
+function flip(){
+  var s=state.session; if(!s||view.name!=='test') return;
+  var ta=$('#own'); if(ta) s.draft=ta.value;
+  s.flipped=!s.flipped;
+  $('#flip').classList.toggle('is-flipped',s.flipped);
+  var fr=$('.front'), bk=$('.back');
+  fr.toggleAttribute('inert',s.flipped); bk.toggleAttribute('inert',!s.flipped);
+  fr.setAttribute('aria-hidden',s.flipped?'true':'false'); bk.setAttribute('aria-hidden',s.flipped?'false':'true');
+  $('#flipbtn').textContent=s.flipped?'Zurückdrehen':'Umdrehen';
+  $$('.rate-btn').forEach(function(b){b.disabled=!s.flipped});
+  $('#rate-hint').textContent=s.flipped?'':'Erst umdrehen, dann bewerten.';
+  setOwnView();
+  if(s.flipped){if(ta)ta.blur();}else if(ta){try{ta.focus({preventScroll:true});}catch(e){}}
+  save();
+}
+function rate(k){
+  var s=state.session; if(!s||!s.flipped) return;
+  var id=s.ids[s.i], f=getFolder(s.folderId), c=f&&f.cards.find(function(x){return x.id===id});
+  var ta=$('#own'); if(ta) s.draft=ta.value;
+  if(c){ s.res[id]={s:k,own:(s.draft||'').trim(),q:c.q,a:c.a}; c.s=k; }
+  s.i++; s.flipped=false; s.draft='';
+  if(s.i>=s.ids.length){s.done=true;save();go({name:'review'});return;}
+  save(); go({name:'test'});
+}
+function startSession(f,ids){
+  state.session={folderId:f.id,folderName:f.name,ids:ids,i:0,res:{},flipped:false,draft:'',done:false};
+  save(); go({name:'test'});
+}
+
+/* ---------- Ansicht: Ergebnis ---------- */
+function viewReview(){
+  var s=state.session;
+  var items=s.ids.filter(function(id){return s.res[id]}).map(function(id){var r=s.res[id];return {id:id,s:r.s,own:r.own,q:r.q,a:r.a}});
+  var c={richtig:0,mittel:0,falsch:0}; items.forEach(function(i){c[i.s]++});
+  var n=items.length;
+  var rows=items.map(function(i,k){
+    return '<li class="ri s-'+i.s+'"><div class="ri-head"><span>Frage '+(k+1)+'</span><span class="badge s-'+i.s+'">'+STATUS[i.s]+'</span></div><p class="ri-q">'+esc(i.q)+'</p><div class="cmp"><div><h3>Richtige Antwort</h3><p>'+esc(i.a)+'</p></div><div><h3>Deine Antwort</h3><p'+(i.own?'':' class="empty"')+'>'+(i.own?esc(i.own):'Nichts eingegeben')+'</p></div></div></li>';
+  }).join('');
+  var opts=[['alle','Alle nochmal',n],['schwach','Mittel und falsch',c.mittel+c.falsch],['falsch','Nur falsch',c.falsch],['mittel','Nur mittel',c.mittel],['richtig','Nur richtig',c.richtig]];
+  var retest=opts.map(function(o){return '<button class="btn" data-a="retest" data-f="'+o[0]+'"'+(o[2]?'':' disabled')+'>'+o[1]+' ('+o[2]+')</button>'}).join('');
+  return topRow('to-folder','Ordner')
+    +'<h1>Ergebnis</h1><p class="lead">'+c.richtig+' von '+n+' richtig in „'+esc(s.folderName||'')+'“</p>'
+    +'<div class="stats3"><div class="stat s-richtig"><b>'+c.richtig+'</b>Richtig</div><div class="stat s-mittel"><b>'+c.mittel+'</b>Mittel</div><div class="stat s-falsch"><b>'+c.falsch+'</b>Falsch</div></div>'
+    +'<h2>Alle Fragen</h2><ul class="rlist">'+rows+'</ul>'
+    +'<h2>Nochmal prüfen</h2><div class="panel"><label class="switch-row"><span>Fragen mischen<small>Zufällige Reihenfolge</small></span><input type="checkbox" role="switch" id="shuf" '+(state.prefs.shuffle?'checked':'')+'></label></div>'
+    +'<div class="retest">'+retest+'</div>'
+    +'<div style="margin-top:14px"><button class="btn ghost" data-a="to-folder">Zurück zum Ordner</button></div>';
+}
+
+/* ---------- Dialoge ---------- */
+function openModal(html,focusSel){
+  lastFocus=document.activeElement;
+  mroot.innerHTML='<div class="overlay" data-m="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-title">'+html+'</div></div>';
+  setTimeout(function(){var el=focusSel&&$(focusSel,mroot);if(el)el.focus();},40);
+}
+function closeModal(){
+  mroot.innerHTML=''; modalCtx=null;
+  if(lastFocus&&document.contains(lastFocus)&&lastFocus.focus){try{lastFocus.focus({preventScroll:true});}catch(e){}}
+}
+function sheetHead(title){return '<div class="sheet-head"><h2 id="m-title">'+esc(title)+'</h2><button class="icon-btn" data-m="close" aria-label="Schließen">'+ICON.x+'</button></div>';}
+function modalFolder(){
+  modalCtx={type:'folder'};
+  openModal(sheetHead('Neuer Ordner')
+    +'<label class="field"><span>Name des Ordners</span><input id="m-name" type="text" maxlength="60" placeholder="z. B. Biologie" autocomplete="off"></label>'
+    +'<p class="err" id="m-err" role="alert"></p>'
+    +'<div class="sheet-actions"><button class="btn primary" data-m="save-folder">Ordner anlegen</button></div>','#m-name');
+}
+function modalCard(cardId){
+  var f=getFolder(view.id), c=cardId?f.cards.find(function(x){return x.id===cardId}):null;
+  modalCtx={type:'card',cardId:cardId||null};
+  openModal(sheetHead(c?'Karte bearbeiten':'Neue Karte')
+    +'<label class="field"><span>Frage</span><textarea id="m-q" rows="3" placeholder="Was möchtest du wissen?"></textarea></label>'
+    +'<label class="field"><span>Lösung</span><textarea id="m-a" rows="4" placeholder="Die richtige Antwort"></textarea></label>'
+    +'<p class="err" id="m-err" role="alert"></p>'
+    +'<div class="sheet-actions">'+(c?'':'<button class="btn" data-m="save-card-next">Speichern und weitere Karte</button>')+'<button class="btn primary" data-m="save-card">Speichern</button></div>','#m-q');
+  if(c){$('#m-q').value=c.q;$('#m-a').value=c.a;}
+}
+function confirmModal(title,text,yesLabel,onYes){
+  modalCtx={type:'confirm',onYes:onYes};
+  openModal(sheetHead(title)+'<p>'+esc(text)+'</p><div class="sheet-actions"><button class="btn ghost" data-m="close">Abbrechen</button><button class="btn danger" data-m="yes">'+esc(yesLabel)+'</button></div>');
+}
+function modalBackup(){
+  modalCtx={type:'backup',armed:false};
+  openModal(sheetHead('Sicherung und Übertragung')
+    +'<p>Deine Karten liegen nur in diesem Browser. Kopiere den Text, um sie zu sichern oder auf ein anderes Gerät zu bringen.</p>'
+    +'<textarea id="m-export" rows="4" readonly aria-label="Sicherungstext"></textarea>'
+    +'<div class="sheet-actions" style="margin-top:10px"><button class="btn" data-m="copy">Text kopieren</button></div>'
+    +'<hr><p>Sicherungstext einfügen. Das ersetzt alle Ordner auf diesem Gerät.</p>'
+    +'<textarea id="m-import" rows="3" placeholder="Sicherungstext hier einfügen" aria-label="Sicherungstext einfügen"></textarea>'
+    +'<p class="err" id="m-err" role="alert" style="margin-top:8px"></p>'
+    +'<div class="sheet-actions"><button class="btn ghost" id="m-import-btn" data-m="import">Wiederherstellen</button></div>','#m-export');
+  $('#m-export').value=JSON.stringify({app:'kartei',version:1,folders:state.folders,prefs:state.prefs});
+}
+function saveFolder(){
+  var name=$('#m-name').value.trim(), err=$('#m-err');
+  if(!name){err.textContent='Bitte gib einen Namen ein.';return;}
+  if(state.folders.some(function(f){return f.name.toLowerCase()===name.toLowerCase()})){err.textContent='Diesen Ordner gibt es schon.';return;}
+  var f={id:uid(),name:name,cards:[]}; state.folders.push(f); save(); closeModal(); go({name:'folder',id:f.id});
+}
+function saveCard(next){
+  var q=$('#m-q').value.trim(), a=$('#m-a').value.trim(), err=$('#m-err');
+  if(!q||!a){err.textContent='Bitte gib Frage und Lösung ein.';(q?$('#m-a'):$('#m-q')).focus();return;}
+  var f=getFolder(view.id);
+  if(modalCtx&&modalCtx.cardId){
+    var c=f.cards.find(function(x){return x.id===modalCtx.cardId}); if(c){c.q=q;c.a=a;}
+    closeModal();
+  }else{
+    f.cards.push({id:uid(),q:q,a:a,s:null});
+    if(next){$('#m-q').value='';$('#m-a').value='';err.textContent='';$('#m-q').focus();toast('Karte gespeichert, '+plural(f.cards.length,'Karte','Karten')+' im Ordner');}
+    else closeModal();
+  }
+  save(); render();
+}
+function copyText(){
+  var ta=$('#m-export'); ta.focus(); ta.select(); try{ta.setSelectionRange(0,ta.value.length);}catch(e){}
+  var done=function(ok){toast(ok?'Text kopiert':'Text ist markiert, bitte selbst kopieren');};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){done(true)},function(){var ok=false;try{ok=document.execCommand('copy')}catch(e){}done(ok)});}
+  else{var ok=false;try{ok=document.execCommand('copy')}catch(e){}done(ok);}
+}
+function importBackup(){
+  var btn=$('#m-import-btn'), err=$('#m-err'), txt=$('#m-import').value.trim();
+  if(!txt){err.textContent='Bitte füge zuerst den Sicherungstext ein.';return;}
+  var d; try{d=JSON.parse(txt); if(!d||!Array.isArray(d.folders)) throw new Error('x');}catch(e){err.textContent='Der Text ist keine gültige Sicherung.';return;}
+  if(!modalCtx.armed){modalCtx.armed=true;btn.textContent='Ja, alles ersetzen';btn.className='btn danger';err.textContent='';return;}
+  var n=normalize({folders:d.folders,prefs:d.prefs}); state.folders=n.folders; state.prefs=n.prefs; state.session=null;
+  save(); closeModal(); go({name:'home'}); toast('Sicherung wiederhergestellt');
+}
+
+/* ---------- Aktionen ---------- */
+var A={
+  'home':function(){go({name:'home'})},
+  'open-folder':function(el){go({name:'folder',id:el.dataset.id})},
+  'back-folder':function(){go({name:'folder',id:view.id})},
+  'new-folder':function(){modalFolder()},
+  'backup':function(){modalBackup()},
+  'del-folder':function(el){
+    var f=getFolder(el.dataset.id); if(!f) return;
+    confirmModal('Ordner löschen?','„'+f.name+'“ und '+plural(f.cards.length,'Karte','Karten')+' werden gelöscht. Das lässt sich nicht rückgängig machen.','Ordner löschen',function(){
+      state.folders=state.folders.filter(function(x){return x.id!==f.id});
+      if(state.session&&state.session.folderId===f.id) state.session=null;
+      save(); render(); toast('Ordner gelöscht');
+    });
+  },
+  'new-card':function(){modalCard(null)},
+  'edit-card':function(el){modalCard(el.dataset.id)},
+  'del-card':function(el){
+    var f=getFolder(view.id), c=f&&f.cards.find(function(x){return x.id===el.dataset.id}); if(!c) return;
+    confirmModal('Karte löschen?','Die Karte „'+(c.q.length>80?c.q.slice(0,80)+'…':c.q)+'“ wird gelöscht.','Karte löschen',function(){
+      f.cards=f.cards.filter(function(x){return x.id!==c.id}); sanitizeSession(); save(); render(); toast('Karte gelöscht');
+    });
+  },
+  'reset-status':function(){
+    var f=getFolder(view.id); if(!f) return;
+    confirmModal('Status zurücksetzen?','Alle Karten in „'+f.name+'“ gelten danach wieder als nicht geprüft.','Zurücksetzen',function(){
+      f.cards.forEach(function(c){c.s=null}); save(); render(); toast('Status zurückgesetzt');
+    });
+  },
+  'setup':function(){
+    var f=getFolder(view.id); if(!f||!f.cards.length) return;
+    if(!poolCards(f,state.prefs.pool).length) state.prefs.pool='all';
+    go({name:'setup',id:f.id});
+  },
+  'pool':function(el){state.prefs.pool=el.dataset.p;save();render();},
+  'step':function(el){
+    var f=getFolder(view.id), max=poolCards(f,state.prefs.pool).length, cur=effCount(max);
+    state.prefs.count=Math.max(1,Math.min(max,cur+(+el.dataset.d))); updateCount(); saveSoon();
+  },
+  'all-count':function(){
+    var f=getFolder(view.id); state.prefs.count=poolCards(f,state.prefs.pool).length; updateCount(); saveSoon();
+  },
+  'start':function(){
+    var f=getFolder(view.id), p=state.prefs, list=poolCards(f,p.pool); if(!list.length) return;
+    var n=effCount(list.length), ids=list.map(function(c){return c.id});
+    if(p.shuffle) ids=shuffled(ids);
+    startSession(f,ids.slice(0,n));
+  },
+  'flip':function(){flip()},
+  'rate':function(el){rate(el.dataset.s)},
+  'pause':function(){var s=state.session; save(); go({name:'folder',id:s.folderId});},
+  'resume-session':function(){
+    sanitizeSession(); var s=state.session;
+    if(!s){save();go({name:'home'});return;}
+    go({name:s.done?'review':'test'});
+  },
+  'view-result':function(){go({name:'review'})},
+  'discard-session':function(){state.session=null;save();render();},
+  'to-folder':function(){var s=state.session; if(s&&getFolder(s.folderId)) go({name:'folder',id:s.folderId}); else go({name:'home'});},
+  'retest':function(el){
+    var s=state.session, f=getFolder(s.folderId); if(!f){go({name:'home'});return;}
+    var k=el.dataset.f;
+    var ids=s.ids.filter(function(id){
+      var r=s.res[id]; if(!r) return false;
+      if(!f.cards.some(function(c){return c.id===id})) return false;
+      if(k==='alle') return true;
+      if(k==='schwach') return r.s==='mittel'||r.s==='falsch';
+      return r.s===k;
+    });
+    if(!ids.length) return;
+    if(state.prefs.shuffle) ids=shuffled(ids);
+    startSession(f,ids);
+  }
+};
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-a]'); if(!el||el.disabled) return;
+  var fn=A[el.dataset.a]; if(fn) fn(el,e);
+});
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='shuf'){state.prefs.shuffle=e.target.checked;save();}
+});
+mroot.addEventListener('click',function(e){
+  var el=e.target.closest('[data-m]'); if(!el) return;
+  var m=el.dataset.m;
+  if(m==='overlay'){if(e.target===el)closeModal();return;}
+  if(m==='close') closeModal();
+  else if(m==='save-folder') saveFolder();
+  else if(m==='save-card') saveCard(false);
+  else if(m==='save-card-next') saveCard(true);
+  else if(m==='yes'){var fn=modalCtx&&modalCtx.onYes;closeModal();if(fn)fn();}
+  else if(m==='copy') copyText();
+  else if(m==='import') importBackup();
+});
+mroot.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&e.target.id==='m-name'){e.preventDefault();saveFolder();}
+  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)&&(e.target.id==='m-q'||e.target.id==='m-a')){e.preventDefault();saveCard(!(modalCtx&&modalCtx.cardId));}
+});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&mroot.firstChild){closeModal();return;}
+  if(view.name==='test'&&state.session&&state.session.flipped&&!mroot.firstChild&&!/^(TEXTAREA|INPUT)$/.test(e.target.tagName)){
+    var k={'1':'richtig','2':'mittel','3':'falsch'}[e.key]; if(k) rate(k);
+  }
+});
+window.addEventListener('resize',function(){var t=$('#own'); if(t) grow(t);});
+
+render();
+})();
+</script>
+</body>
+</html>
