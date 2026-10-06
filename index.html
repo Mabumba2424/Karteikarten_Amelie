@@ -75,7 +75,6 @@ h2{font:650 17px/1.3 var(--round);margin:26px 0 10px}
 .crow-text{display:grid;gap:2px;min-width:0}
 .crow-q{font-weight:600;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .crow-a{color:var(--muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.crow-thumb{width:40px;height:40px;flex:none;border-radius:8px;object-fit:cover;background:var(--none-bg);margin-top:2px}
 .dot{width:12px;height:12px;border-radius:50%;flex:none;margin-top:6px;background:var(--none-bg);border:2px solid var(--muted)}
 .dot.s-richtig{background:var(--ok);border-color:var(--ok)}
 .dot.s-mittel{background:var(--mid);border-color:var(--mid)}
@@ -116,15 +115,14 @@ input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
 .kbd-hint{display:none;color:var(--muted);font-size:13px;margin:6px 0 0;text-align:center}
 @media (hover:hover) and (pointer:fine){.kbd-hint{display:block}}
 
-/* ===== Bild-Upload in Karten-Formular ===== */
-.imgfield{display:grid;gap:8px;margin:0 0 14px}
-.imgfield>span{font-weight:600;font-size:15px}
-.imgfield small{color:var(--muted);font-weight:500}
-.img-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.img-prev{width:84px;height:84px;border-radius:12px;object-fit:cover;background:var(--bg);border:1.5px solid var(--line);display:none}
-.img-prev.has{display:block}
-.img-dropzone{min-height:44px;padding:0 14px;border-radius:12px;border:1.5px dashed var(--line);background:var(--bg);font-weight:600;font-size:14px;color:var(--muted);display:inline-flex;align-items:center;gap:8px}
-.img-dropzone input{display:none}
+/* ===== Ordnerauswahl beim Prüfen ===== */
+.sel{padding:4px 6px}
+.selrow{display:flex;width:100%;align-items:center;gap:12px;min-height:48px;border:0;background:none;text-align:left;font-weight:600}
+.selname{flex:1;min-width:0;overflow-wrap:anywhere}
+.selrow small{color:var(--muted);font-weight:500}
+.cb{width:24px;height:24px;flex:none;border-radius:7px;border:2px solid var(--muted);display:grid;place-items:center}
+.selrow[aria-checked="true"] .cb{background:var(--accent);border-color:var(--accent)}
+.selrow[aria-checked="true"] .cb::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
 
 /* ===== Prüfung: Karteikarte ===== */
 .prog{height:6px;border-radius:3px;background:var(--none-bg);overflow:hidden;margin:6px 0 4px}
@@ -137,17 +135,15 @@ input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
 .face[inert]{pointer-events:none}
 .face-head{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 20px;background:hsl(var(--h,225) 100% 95%);border-radius:8px 8px 0 0;border-bottom:2px solid var(--margin);font-weight:600;font-size:14px;color:var(--muted)}
 .face-head span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.face-body{flex:1;padding:14px 20px;min-height:calc(var(--lh)*9);border-radius:0 0 8px 8px;font:17px/var(--lh) ui-serif,"New York","Iowan Old Style",Georgia,serif;background:linear-gradient(to bottom,transparent calc(var(--lh) - 1px),var(--rule) calc(var(--lh) - 1px)) 0 14px/100% var(--lh) repeat-y}
+.face-body{flex:1;padding:0 20px;min-height:calc(var(--lh)*9);border-radius:0 0 8px 8px;font:17px/var(--lh) ui-serif,"New York","Iowan Old Style",Georgia,serif;background:linear-gradient(to bottom,transparent calc(var(--lh) - 1px),var(--rule) calc(var(--lh) - 1px)) 0 0/100% var(--lh) repeat-y}
 .face-body p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .face-body:focus-within{box-shadow:inset 3px 0 0 var(--accent)}
 .q{font-weight:600;margin-bottom:var(--lh)!important}
-.face-img{max-width:100%;max-height:220px;display:block;border-radius:8px;margin:0 0 var(--lh);object-fit:contain}
 .face-body textarea{display:block;width:100%;padding:0;margin:0;border:0;outline:0;background:transparent;resize:none;overflow:hidden;font:inherit;min-height:calc(var(--lh)*4)}
 .face-body textarea::placeholder{color:var(--muted);opacity:.8}
 .cmp{display:grid;grid-template-columns:1fr 1fr;column-gap:22px}
 .cmp h3{margin:0;font:600 14px/var(--lh) -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color:var(--muted)}
 .cmp p.empty{color:var(--muted);font-style:italic}
-.cmp img{max-width:100%;max-height:140px;border-radius:8px;display:block;margin:4px 0;object-fit:contain}
 @media (max-width:519px){.cmp{grid-template-columns:1fr}.cmp>div+div{margin-top:var(--lh)}}
 .rate-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
 .rate-btn{min-height:58px;border-radius:16px;border:0;font:700 17px var(--round)}
@@ -207,8 +203,6 @@ input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
    ===================================================================== */
 var KEY = 'kartei-app-v1';
 var LH = 30;
-var MAX_IMG = 1200;      // max. Kantenlänge beim Verkleinern hochgeladener Bilder
-var MAX_IMG_BYTES = 1500000; // ~1.5MB Sicherheitslimit pro Bild (localStorage ist begrenzt)
 var STATUS = {richtig:'Richtig', mittel:'Mittel', falsch:'Falsch'};
 var TYPES  = {de:'Nur Deutsch', deen:'Deutsch – Englisch'};
 var DIRS   = {mixed:'Gemischt', 'de-en':'Deutsch → Englisch', 'en-de':'Englisch → Deutsch'};
@@ -221,8 +215,7 @@ var ICON = {
   trash:  svg('M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v5M14 11v5',21,1.9),
   back:   svg('M15 5l-7 7 7 7',24,2.4),
   x:      svg('M6 6l12 12M18 6L6 18'),
-  backup: svg('M12 4v11M8 11l4 4 4-4M5 20h14',22,1.9),
-  image:  svg('M4 5h16v14H4V5zM4 16l5-5 4 4 3-3 4 4M9 10a1 1 0 100-2 1 1 0 000 2z',20,1.8)
+  backup: svg('M12 4v11M8 11l4 4 4-4M5 20h14',22,1.9)
 };
 
 /* =====================================================================
@@ -242,30 +235,6 @@ function toast(msg){
   toastTimer = setTimeout(function(){t.classList.remove('show');}, 2400);
 }
 
-/* Bild aus Datei lesen, verkleinern und als JPEG-DataURL zurückgeben */
-function readImageFile(file){
-  return new Promise(function(resolve,reject){
-    if(!file || file.type.indexOf('image/') !== 0){ reject(new Error('kein Bild')); return; }
-    var reader = new FileReader();
-    reader.onerror = function(){ reject(new Error('Lesefehler')); };
-    reader.onload = function(){
-      var img = new Image();
-      img.onerror = function(){ reject(new Error('Bildfehler')); };
-      img.onload = function(){
-        var w = img.width, h = img.height, scale = Math.min(1, MAX_IMG/Math.max(w,h));
-        var cw = Math.max(1,Math.round(w*scale)), ch = Math.max(1,Math.round(h*scale));
-        var cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
-        var ctx = cv.getContext('2d'); ctx.drawImage(img,0,0,cw,ch);
-        var url = cv.toDataURL('image/jpeg', 0.82);
-        if(url.length > MAX_IMG_BYTES){ url = cv.toDataURL('image/jpeg', 0.55); }
-        resolve(url);
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
 /* =====================================================================
    3. STORE: Daten laden und speichern
    ===================================================================== */
@@ -279,14 +248,14 @@ var Store = {
         id: f.id || uid(),
         name: f.name,
         type: f.type === 'deen' ? 'deen' : 'de',   // ältere Ordner ohne Typ gelten als „Nur Deutsch“
+        parent: typeof f.parent === 'string' ? f.parent : null,   // Unterordner verweisen auf ihren Oberordner
         cards: (Array.isArray(f.cards) ? f.cards : []).filter(function(c){return c && typeof c.q === 'string';}).map(function(c){
-          return {
-            id:c.id||uid(), q:c.q, a:String(c.a==null?'':c.a), s:(c.s==='richtig'||c.s==='mittel'||c.s==='falsch')?c.s:null,
-            qImg: (typeof c.qImg === 'string' && c.qImg.indexOf('data:image/') === 0) ? c.qImg : null,
-            aImg: (typeof c.aImg === 'string' && c.aImg.indexOf('data:image/') === 0) ? c.aImg : null
-          };
+          return {id:c.id||uid(), q:c.q, a:String(c.a==null?'':c.a), s:(c.s==='richtig'||c.s==='mittel'||c.s==='falsch')?c.s:null};
         })
       };
+    });
+    s.folders.forEach(function(f){
+      if(f.parent===f.id || (f.parent && !s.folders.some(function(x){return x.id===f.parent;}))) f.parent = null;
     });
     s.session = (s.session && Array.isArray(s.session.ids) && s.session.res) ? s.session : null;
     if(s.session && !s.session.dirs) s.session.dirs = {};
@@ -306,7 +275,7 @@ var Store = {
   save: function(){
     clearTimeout(saveTimer); saveTimer = null;
     try{ localStorage.setItem(KEY, JSON.stringify(state)); }
-    catch(e){ if(!storageWarned){storageWarned = true; toast('Speichern im Browser nicht möglich (evtl. zu viele/große Bilder). Deine letzten Änderungen bleiben nur bis zum Schließen erhalten.');} }
+    catch(e){ if(!storageWarned){storageWarned = true; toast('Speichern im Browser nicht möglich. Deine Karten bleiben nur bis zum Schließen erhalten.');} }
   },
   saveSoon: function(){ clearTimeout(saveTimer); saveTimer = setTimeout(Store.save, 300); }
 };
@@ -320,6 +289,18 @@ document.addEventListener('visibilitychange', function(){ if(document.hidden && 
 var Model = {
   folder: function(id){ return state.folders.find(function(f){return f.id===id;}); },
   isDeen: function(f){ return !!f && f.type === 'deen'; },
+  /* Unterordner eines Ordners (id = null: oberste Ebene) */
+  kids: function(id){ return state.folders.filter(function(f){return (f.parent||null)===(id||null);}); },
+  /* Ordner + alle Unterordner (rekursiv) als Liste von IDs */
+  tree: function(id){ var r=[id]; Model.kids(id).forEach(function(k){ r=r.concat(Model.tree(k.id)); }); return r; },
+  /* Alle Karten eines Ordners inklusive aller Unterordner */
+  cardsOf: function(id){ var r=[]; Model.tree(id).forEach(function(i){ var f=Model.folder(i); if(f) r=r.concat(f.cards); }); return r; },
+  /* Karten der angehakten Ordner (Auswahl beim Prüfen) */
+  selCards: function(f){
+    var sel = view.sel || [f.id], r = [];
+    Model.tree(f.id).forEach(function(i){ var x = Model.folder(i); if(x && sel.indexOf(i)>-1) r = r.concat(x.cards); });
+    return r;
+  },
   shuffled: function(a){
     var r = a.slice();
     for(var i=r.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=r[i]; r[i]=r[j]; r[j]=t; }
@@ -333,15 +314,15 @@ var Model = {
     return c;
   },
   pool: function(f,p){
-    var c = f.cards;
+    var c = Model.selCards(f);
     if(p==='schwach') return c.filter(function(x){return x.s==='mittel'||x.s==='falsch';});
     if(p==='falsch')  return c.filter(function(x){return x.s==='falsch';});
     if(p==='neu')     return c.filter(function(x){return !x.s;});
     return c;
   },
   effCount: function(max){ return max<1 ? 0 : Math.max(1, Math.min(state.prefs.count, max)); },
-  /* Frage/Antwort je nach Richtung: Karten speichern immer q = Deutsch, a = Englisch (gilt auch für Bilder) */
-  side: function(card,dir){ return dir==='en-de' ? {q:card.a, a:card.q, qImg:card.aImg, aImg:card.qImg} : {q:card.q, a:card.a, qImg:card.qImg, aImg:card.aImg}; },
+  /* Frage/Antwort je nach Richtung: Karten speichern immer q = Deutsch, a = Englisch */
+  side: function(card,dir){ return dir==='en-de' ? {q:card.a, a:card.q} : {q:card.q, a:card.a}; },
   /* Richtung je Karte festlegen (nur Deutsch-Englisch-Ordner kennen „en-de“) */
   pickDirs: function(f,ids,mode){
     var d = {};
@@ -355,9 +336,9 @@ var Model = {
     var f = Model.folder(s.folderId);
     if(!f){ state.session = null; return; }
     if(s.done) return;
-    var keep = [], ni = 0;
+    var keep = [], ni = 0, all = Model.cardsOf(f.id);
     s.ids.forEach(function(id,idx){
-      if(f.cards.some(function(c){return c.id===id;})){ keep.push(id); if(idx<s.i) ni++; }
+      if(all.some(function(c){return c.id===id;})){ keep.push(id); if(idx<s.i) ni++; }
     });
     s.ids = keep; s.i = ni;
     if(!keep.length) state.session = null;
@@ -387,39 +368,62 @@ var Views = {
     return '<div class="banner"><p>Prüfung in „'+fn+'“ läuft, Frage '+(s.i+1)+' von '+s.ids.length+'</p><div class="banner-actions"><button class="btn small primary" data-a="resume-session">Fortsetzen</button><button class="btn small ghost" data-a="discard-session">Verwerfen</button></div></div>';
   },
 
+  /* --- Liste von Ordnern (Startseite und Unterordner) --- */
+  tileList: function(list){
+    return '<ul class="tiles">'+list.map(function(f){
+      var cs = Model.cardsOf(f.id), n = cs.length, k = Model.kids(f.id).length;
+      var meta = plural(n,'Karte','Karten')+(k?' · '+plural(k,'Unterordner','Unterordner'):'')+(Model.isDeen(f)?' · DE–EN':'');
+      return '<li class="tile" style="--h:'+Model.hue(f.name)+'"><button class="tile-main" data-a="open-folder" data-id="'+f.id+'"><span class="tile-av" aria-hidden="true">'+esc(Model.initial(f.name))+'</span><span class="tile-body"><span class="tile-name">'+esc(f.name)+'</span><span class="tile-meta">'+meta+'</span>'+Views.bar(cs)+'</span></button><button class="icon-btn danger" data-a="del-folder" data-id="'+f.id+'" aria-label="Ordner '+esc(f.name)+' löschen">'+ICON.trash+'</button></li>';
+    }).join('')+'</ul>';
+  },
+
+  /* --- Ordnerauswahl (Baum mit Häkchen) beim Prüfen --- */
+  selBlock: function(f){
+    if(Model.tree(f.id).length<2) return '';
+    var sel = view.sel || [];
+    var row = function(id,d){
+      var x = Model.folder(id), on = sel.indexOf(id)>-1;
+      return '<button class="selrow" style="padding-left:'+(12+d*22)+'px" data-a="tog" data-id="'+id+'" role="checkbox" aria-checked="'+on+'"><span class="cb" aria-hidden="true"></span><span class="selname">'+esc(x.name)+'</span><small>'+plural(x.cards.length,'Karte','Karten')+'</small></button>'
+        +Model.kids(id).map(function(k){return row(k.id,d+1);}).join('');
+    };
+    return '<h2>Welche Ordner?</h2><div class="panel sel">'+row(f.id,0)+'</div>'
+      +'<div class="row-actions" style="margin:8px 0 0"><button class="btn small ghost" data-a="sel-all">Alle auswählen</button><button class="btn small ghost" data-a="sel-none">Keine</button></div>';
+  },
+
   /* --- Startseite: Ordnerliste --- */
   home: function(){
     var list = state.folders.length
-      ? '<ul class="tiles">'+state.folders.map(function(f){
-          var n = f.cards.length, meta = plural(n,'Karte','Karten')+(Model.isDeen(f)?' · DE–EN':'');
-          return '<li class="tile" style="--h:'+Model.hue(f.name)+'"><button class="tile-main" data-a="open-folder" data-id="'+f.id+'"><span class="tile-av" aria-hidden="true">'+esc(Model.initial(f.name))+'</span><span class="tile-body"><span class="tile-name">'+esc(f.name)+'</span><span class="tile-meta">'+meta+'</span>'+Views.bar(f.cards)+'</span></button><button class="icon-btn danger" data-a="del-folder" data-id="'+f.id+'" aria-label="Ordner '+esc(f.name)+' löschen">'+ICON.trash+'</button></li>';
-        }).join('')+'</ul>'
+      ? Views.tileList(Model.kids(null))
       : '<div class="empty-state"><p>Noch kein Ordner. Lege einen Ordner an, zum Beispiel „Biologie“ oder „Englisch Vokabeln“, und schreibe dann deine Karten hinein.</p><button class="btn primary" data-a="new-folder">Ordner anlegen</button></div>';
     return Views.topRow('','','<button class="icon-btn outline" data-a="backup" aria-label="Sicherung und Übertragung">'+ICON.backup+'</button><button class="icon-btn accent" data-a="new-folder" aria-label="Neuen Ordner anlegen">'+ICON.plus+'</button>')
       +'<h1 class="brand"><svg viewBox="0 0 44 44" width="42" height="42" aria-hidden="true"><rect x="3" y="9" width="26" height="30" rx="6" fill="#FFC93C" transform="rotate(-12 16 24)"/><rect x="9" y="5" width="26" height="30" rx="6" fill="#4FD69B" transform="rotate(5 22 20)"/><rect x="14" y="8" width="26" height="30" rx="6" fill="#fff" stroke="#5468FF" stroke-width="2.5"/><path d="M19 17h16M19 23h16M19 29h10" stroke="#8FB4FF" stroke-width="2.2" stroke-linecap="round"/></svg>Kartei</h1>'
       +Views.banner()+list;
   },
 
-  /* --- Ordner: Kartenliste --- */
+  /* --- Ordner: Unterordner und Kartenliste --- */
   folder: function(){
-    var f = Model.folder(view.id), n = f.cards.length, c = Model.counts(f.cards), rated = n-c.neu;
+    var f = Model.folder(view.id), all = Model.cardsOf(f.id), n = all.length, c = Model.counts(all), rated = n-c.neu;
+    var kids = Model.kids(f.id), par = f.parent && Model.folder(f.parent);
     var banner = (state.session && state.session.folderId===f.id) ? Views.banner() : '';
-    var list = n
-      ? '<ul class="clist">'+f.cards.map(function(x){
-          var thumb = (x.qImg||x.aImg) ? '<img class="crow-thumb" src="'+(x.qImg||x.aImg)+'" alt="">' : '';
-          return '<li class="crow"><button class="crow-main" data-a="edit-card" data-id="'+x.id+'"><span class="dot s-'+(x.s||'none')+'" aria-hidden="true"></span>'+thumb+'<span class="crow-text"><span class="crow-q">'+esc(x.q)+'</span><span class="crow-a">'+esc(x.a)+'</span><span class="sr-only">'+(x.s?STATUS[x.s]:'Noch nicht geprüft')+'</span></span></button><button class="icon-btn danger" data-a="del-card" data-id="'+x.id+'" aria-label="Karte löschen: '+esc(x.q.slice(0,60))+'">'+ICON.trash+'</button></li>';
+    var subs = kids.length ? '<h2>Unterordner</h2>'+Views.tileList(kids) : '';
+    var own = f.cards.length
+      ? '<h2>Karten'+(kids.length?' in diesem Ordner':'')+'</h2><ul class="clist">'+f.cards.map(function(x){
+          return '<li class="crow"><button class="crow-main" data-a="edit-card" data-id="'+x.id+'"><span class="dot s-'+(x.s||'none')+'" aria-hidden="true"></span><span class="crow-text"><span class="crow-q">'+esc(x.q)+'</span><span class="crow-a">'+esc(x.a)+'</span><span class="sr-only">'+(x.s?STATUS[x.s]:'Noch nicht geprüft')+'</span></span></button><button class="icon-btn danger" data-a="del-card" data-id="'+x.id+'" aria-label="Karte löschen: '+esc(x.q.slice(0,60))+'">'+ICON.trash+'</button></li>';
         }).join('')+'</ul>'
-      : '<div class="empty-state"><p>Noch keine Karten. Tippe auf +, '+(Model.isDeen(f)?'schreibe das deutsche und das englische Wort':'schreibe die Frage und die Lösung')+' und füge bei Bedarf ein Bild hinzu, fertig.</p><button class="btn primary" data-a="new-card">Erste Karte anlegen</button></div>';
-    return Views.topRow('home','Ordner','<button class="icon-btn accent" data-a="new-card" aria-label="Neue Karte hinzufügen">'+ICON.plus+'</button>')
+      : '';
+    var empty = (!kids.length && !f.cards.length)
+      ? '<div class="empty-state"><p>Noch leer. Tippe auf +, '+(Model.isDeen(f)?'schreibe das deutsche und das englische Wort':'schreibe die Frage und die Lösung')+', oder lege einen Unterordner an.</p><button class="btn primary" data-a="new-card">Erste Karte anlegen</button></div>'
+      : '';
+    return Views.topRow(par?'up':'home', par?par.name:'Ordner','<button class="icon-btn accent" data-a="new-card" aria-label="Neue Karte hinzufügen">'+ICON.plus+'</button>')
       +'<h1>'+esc(f.name)+'</h1>'
       +(Model.isDeen(f)?'<p class="lead">'+TYPES.deen+'</p>':'')
       +banner
       +'<div class="badges"><span class="badge s-richtig">Richtig '+c.richtig+'</span><span class="badge s-mittel">Mittel '+c.mittel+'</span><span class="badge s-falsch">Falsch '+c.falsch+'</span><span class="badge">Offen '+c.neu+'</span></div>'
-      +'<div class="row-actions"><button class="btn primary" data-a="setup"'+(n?'':' disabled')+'>Prüfung starten</button><button class="btn ghost" data-a="reset-status"'+(rated?'':' disabled')+'>Status zurücksetzen</button></div>'
-      +list;
+      +'<div class="row-actions"><button class="btn primary" data-a="setup"'+(n?'':' disabled')+'>Prüfung starten</button><button class="btn" data-a="new-sub">Unterordner anlegen</button><button class="btn ghost" data-a="reset-status"'+(rated?'':' disabled')+'>Status zurücksetzen</button></div>'
+      +subs+own+empty;
   },
 
-  /* --- Prüfung einrichten (bei Deutsch-Englisch: Richtung wählen) --- */
+  /* --- Prüfung einrichten (Ordner wählen, bei Deutsch-Englisch: Richtung wählen) --- */
   setup: function(){
     var f = Model.folder(view.id), p = state.prefs;
     var pools = [['all','Alle Karten'],['schwach','Mittel und falsch'],['falsch','Nur falsch'],['neu','Noch nicht geprüft']];
@@ -436,7 +440,7 @@ var Views = {
     var note = (state.session && !state.session.done) ? '<p class="hint">Die laufende Prüfung wird durch diese ersetzt.</p>' : '';
     return Views.topRow('back-folder','Ordner')
       +'<h1>Prüfung starten</h1><p class="lead">'+esc(f.name)+'</p>'
-      +dirBlock
+      +dirBlock+Views.selBlock(f)
       +'<h2>Welche Karten?</h2><div class="seg">'+seg+'</div>'
       +'<h2>Wie viele Fragen?</h2><div class="panel">'
         +'<div class="count-row"><button class="icon-btn outline" data-a="step" data-d="-1" aria-label="Eine Frage weniger"'+(max<2?' disabled':'')+'>'+ICON.minus+'</button>'
@@ -451,21 +455,19 @@ var Views = {
   /* --- Prüfung: eine Karte --- */
   test: function(){
     var s = state.session, f = Model.folder(s.folderId);
-    var id = s.ids[s.i], c = f.cards.find(function(x){return x.id===id;}), total = s.ids.length, fl = !!s.flipped;
+    var id = s.ids[s.i], c = Model.cardsOf(f.id).find(function(x){return x.id===id;}), total = s.ids.length, fl = !!s.flipped;
     var dir = s.dirs[id] || 'de-en', sd = Model.side(c,dir), deen = Model.isDeen(f);
     var frontLabel = deen ? DIRS[dir] : 'Frage';
-    var frontImg = sd.qImg ? '<img class="face-img" src="'+sd.qImg+'" alt="">' : '';
-    var backImg  = sd.aImg ? '<img class="face-img" src="'+sd.aImg+'" alt="">' : '';
     return Views.topRow('pause','Pausieren','<span class="count">Frage '+(s.i+1)+' von '+total+'</span>')
       +'<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+s.i+'"><i style="width:'+(s.i/total*100)+'%"></i></div>'
       +'<div class="flip'+(fl?' is-flipped':'')+'" id="flip" style="--h:'+Model.hue(f.name)+'"><div class="flip-inner">'
         +'<section class="face front" aria-label="Vorderseite"'+(fl?' inert aria-hidden="true"':'')+'>'
           +'<div class="face-head"><span>'+frontLabel+'</span><span>'+esc(f.name)+'</span></div>'
-          +'<div class="face-body">'+frontImg+'<p class="q">'+esc(sd.q)+'</p><label class="sr-only" for="own">Deine Antwort</label><textarea id="own" placeholder="'+(deen?'Übersetzung eintippen …':'Schreibe deine Antwort …')+'" autocapitalize="'+(dir==='en-de'?'sentences':'none')+'"></textarea></div>'
+          +'<div class="face-body"><p class="q">'+esc(sd.q)+'</p><label class="sr-only" for="own">Deine Antwort</label><textarea id="own" placeholder="'+(deen?'Übersetzung eintippen …':'Schreibe deine Antwort …')+'" autocapitalize="'+(dir==='en-de'?'sentences':'none')+'"></textarea></div>'
         +'</section>'
         +'<section class="face back" aria-label="Rückseite"'+(fl?'':' inert aria-hidden="true"')+'>'
           +'<div class="face-head"><span>Lösung</span><span>'+esc(f.name)+'</span></div>'
-          +'<div class="face-body">'+frontImg+'<p class="q">'+esc(sd.q)+'</p><div class="cmp"><div><h3>Richtige Antwort</h3>'+backImg+'<p>'+esc(sd.a)+'</p></div><div><h3>Deine Antwort</h3><p id="own-view"></p></div></div></div>'
+          +'<div class="face-body"><p class="q">'+esc(sd.q)+'</p><div class="cmp"><div><h3>Richtige Antwort</h3><p>'+esc(sd.a)+'</p></div><div><h3>Deine Antwort</h3><p id="own-view"></p></div></div></div>'
         +'</section>'
       +'</div></div>'
       +'<button class="btn primary wide" id="flipbtn" data-a="flip" style="margin-top:16px">'+(fl?'Zurückdrehen':'Umdrehen')+'</button>'
@@ -479,11 +481,11 @@ var Views = {
   /* --- Ergebnis --- */
   review: function(){
     var s = state.session;
-    var items = s.ids.filter(function(id){return s.res[id];}).map(function(id){var r=s.res[id]; return {s:r.s, own:r.own, q:r.q, a:r.a, lbl:r.lbl||'', qImg:r.qImg, aImg:r.aImg};});
+    var items = s.ids.filter(function(id){return s.res[id];}).map(function(id){var r=s.res[id]; return {s:r.s, own:r.own, q:r.q, a:r.a, lbl:r.lbl||''};});
     var c = {richtig:0, mittel:0, falsch:0}; items.forEach(function(i){c[i.s]++;});
     var n = items.length;
     var rows = items.map(function(i,k){
-      return '<li class="ri s-'+i.s+'"><div class="ri-head"><span>Frage '+(k+1)+(i.lbl?' · '+i.lbl:'')+'</span><span class="badge s-'+i.s+'">'+STATUS[i.s]+'</span></div>'+(i.qImg?'<img class="face-img" style="max-height:140px" src="'+i.qImg+'" alt="">':'')+'<p class="ri-q">'+esc(i.q)+'</p><div class="cmp"><div><h3>Richtige Antwort</h3>'+(i.aImg?'<img src="'+i.aImg+'" alt="">':'')+'<p>'+esc(i.a)+'</p></div><div><h3>Deine Antwort</h3><p'+(i.own?'':' class="empty"')+'>'+(i.own?esc(i.own):'Nichts eingegeben')+'</p></div></div></li>';
+      return '<li class="ri s-'+i.s+'"><div class="ri-head"><span>Frage '+(k+1)+(i.lbl?' · '+i.lbl:'')+'</span><span class="badge s-'+i.s+'">'+STATUS[i.s]+'</span></div><p class="ri-q">'+esc(i.q)+'</p><div class="cmp"><div><h3>Richtige Antwort</h3><p>'+esc(i.a)+'</p></div><div><h3>Deine Antwort</h3><p'+(i.own?'':' class="empty"')+'>'+(i.own?esc(i.own):'Nichts eingegeben')+'</p></div></div></li>';
     }).join('');
     var opts = [['alle','Alle nochmal',n],['schwach','Mittel und falsch',c.mittel+c.falsch],['falsch','Nur falsch',c.falsch],['mittel','Nur mittel',c.mittel],['richtig','Nur richtig',c.richtig]];
     var retest = opts.map(function(o){return '<button class="btn" data-a="retest" data-f="'+o[0]+'"'+(o[2]?'':' disabled')+'>'+o[1]+' ('+o[2]+')</button>';}).join('');
@@ -576,11 +578,11 @@ var Test = {
   },
   rate: function(k){
     var s = state.session; if(!s || !s.flipped) return;
-    var id = s.ids[s.i], f = Model.folder(s.folderId), c = f && f.cards.find(function(x){return x.id===id;});
+    var id = s.ids[s.i], f = Model.folder(s.folderId), c = f && Model.cardsOf(f.id).find(function(x){return x.id===id;});
     var ta = $('#own'); if(ta) s.draft = ta.value;
     if(c){
       var dir = s.dirs[id] || 'de-en', sd = Model.side(c,dir);
-      s.res[id] = {s:k, own:(s.draft||'').trim(), q:sd.q, a:sd.a, qImg:sd.qImg, aImg:sd.aImg, lbl:Model.isDeen(f)?DIR_SHORT[dir]:''};
+      s.res[id] = {s:k, own:(s.draft||'').trim(), q:sd.q, a:sd.a, lbl:Model.isDeen(f)?DIR_SHORT[dir]:''};
       c.s = k;
     }
     s.i++; s.flipped = false; s.draft = '';
@@ -612,18 +614,20 @@ var Modals = {
     return '<div class="sheet-head"><h2 id="m-title">'+esc(title)+'</h2><button class="icon-btn" data-m="close" aria-label="Schließen">'+ICON.x+'</button></div>';
   },
 
-  /* --- Neuer Ordner (mit Typ-Auswahl) --- */
-  folder: function(){
-    modalCtx = {type:'folder', ftype:'de'};
-    Modals.open(Modals.head('Neuer Ordner')
-      +'<label class="field"><span>Name des Ordners</span><input id="m-name" type="text" maxlength="60" placeholder="z. B. Biologie" autocomplete="off"></label>'
+  /* --- Neuer Ordner / Unterordner (Typ-Auswahl nur bei oberster Ebene) --- */
+  folder: function(parent){
+    modalCtx = {type:'folder', ftype:'de', parent:parent||null};
+    var sub = !!parent;
+    Modals.open(Modals.head(sub?'Neuer Unterordner':'Neuer Ordner')
+      +'<label class="field"><span>Name des Ordners</span><input id="m-name" type="text" maxlength="60" placeholder="z. B. '+(sub?'Körper':'Biologie')+'" autocomplete="off"></label>'
       +'<p class="label">Art der Karteikarten</p>'
       +'<div class="seg stack" role="group" aria-label="Art der Karteikarten" style="margin-bottom:14px">'
         +'<button data-m="type" data-t="de" aria-pressed="true">Nur Deutsch<small>Frage und Lösung</small></button>'
         +'<button data-m="type" data-t="deen" aria-pressed="false">Deutsch – Englisch<small>Vokabeln, beide Richtungen</small></button>'
       +'</div>'
       +'<p class="err" id="m-err" role="alert"></p>'
-      +'<div class="sheet-actions"><button class="btn primary" data-m="save-folder">Ordner anlegen</button></div>', '#m-name');
+      +'<div class="sheet-actions"><button class="btn primary" data-m="save-folder">'+(sub?'Unterordner anlegen':'Ordner anlegen')+'</button></div>', '#m-name');
+    if(sub) $$('.label,.seg',mroot).forEach(function(e){ e.remove(); });   // Unterordner übernimmt die Art vom Oberordner
   },
   setType: function(t){
     modalCtx.ftype = t;
@@ -632,48 +636,23 @@ var Modals = {
   saveFolder: function(){
     var name = $('#m-name').value.trim(), err = $('#m-err');
     if(!name){ err.textContent = 'Bitte gib einen Namen ein.'; return; }
-    if(state.folders.some(function(f){return f.name.toLowerCase()===name.toLowerCase();})){ err.textContent = 'Diesen Ordner gibt es schon.'; return; }
-    var f = {id:uid(), name:name, type:modalCtx.ftype, cards:[]};
-    state.folders.push(f); Store.save(); Modals.close(); App.go({name:'folder', id:f.id});
+    if(state.folders.some(function(f){return (f.parent||null)===modalCtx.parent && f.name.toLowerCase()===name.toLowerCase();})){ err.textContent = 'Diesen Ordner gibt es hier schon.'; return; }
+    var par = modalCtx.parent && Model.folder(modalCtx.parent);
+    var f = {id:uid(), name:name, type:par?par.type:modalCtx.ftype, parent:par?par.id:null, cards:[]};
+    state.folders.push(f); Store.save(); Modals.close();
+    if(par){ App.render(); toast('Unterordner angelegt'); } else App.go({name:'folder', id:f.id});
   },
 
-  /* --- Karte anlegen / bearbeiten (mit optionalem Bild für Frage und Antwort) --- */
+  /* --- Karte anlegen / bearbeiten (Beschriftung je nach Ordnertyp) --- */
   card: function(cardId){
     var f = Model.folder(view.id), c = cardId ? f.cards.find(function(x){return x.id===cardId;}) : null, deen = Model.isDeen(f);
-    modalCtx = {type:'card', cardId:cardId||null, qImg: c ? c.qImg : null, aImg: c ? c.aImg : null};
-    var imgField = function(side,label){
-      return '<div class="imgfield"><span>Bild zu '+label+' <small>(optional)</small></span>'
-        +'<div class="img-row"><img class="img-prev'+(modalCtx[side]?' has':'')+'" id="m-'+side+'-prev" src="'+(modalCtx[side]||'')+'" alt="">'
-        +'<label class="img-dropzone">'+ICON.image+'<span id="m-'+side+'-label">'+(modalCtx[side]?'Bild ersetzen':'Bild hinzufügen')+'</span><input type="file" accept="image/*" id="m-'+side+'-file"></label>'
-        +'<button type="button" class="btn small ghost" data-m="rm-img" data-side="'+side+'" style="display:'+(modalCtx[side]?'inline-flex':'none')+'" id="m-'+side+'-rm">Entfernen</button></div></div>';
-    };
+    modalCtx = {type:'card', cardId:cardId||null};
     Modals.open(Modals.head(c ? 'Karte bearbeiten' : 'Neue Karte')
       +'<label class="field"><span>'+(deen?'Deutsch':'Frage')+'</span><textarea id="m-q" rows="'+(deen?2:3)+'" placeholder="'+(deen?'z. B. der Hund':'Was möchtest du wissen?')+'"></textarea></label>'
-      +imgField('qImg','Frage/Deutsch')
       +'<label class="field"><span>'+(deen?'Englisch':'Lösung')+'</span><textarea id="m-a" rows="'+(deen?2:4)+'" placeholder="'+(deen?'z. B. the dog':'Die richtige Antwort')+'" autocapitalize="none"></textarea></label>'
-      +imgField('aImg','Antwort/Englisch')
       +'<p class="err" id="m-err" role="alert"></p>'
       +'<div class="sheet-actions">'+(c?'':'<button class="btn" data-m="save-card-next">Speichern und weitere Karte</button>')+'<button class="btn primary" data-m="save-card">Speichern</button></div>', '#m-q');
     if(c){ $('#m-q').value = c.q; $('#m-a').value = c.a; }
-    ['qImg','aImg'].forEach(function(side){
-      $('#m-'+side+'-file').addEventListener('change', function(e){
-        var file = e.target.files && e.target.files[0]; if(!file) return;
-        var err = $('#m-err'); err.textContent = '';
-        readImageFile(file).then(function(url){
-          modalCtx[side] = url;
-          var prev = $('#m-'+side+'-prev'); prev.src = url; prev.classList.add('has');
-          $('#m-'+side+'-label').textContent = 'Bild ersetzen';
-          $('#m-'+side+'-rm').style.display = 'inline-flex';
-        }).catch(function(){ err.textContent = 'Dieses Bild konnte nicht geladen werden.'; });
-        e.target.value = '';
-      });
-    });
-  },
-  removeImg: function(side){
-    modalCtx[side] = null;
-    var prev = $('#m-'+side+'-prev'); prev.src=''; prev.classList.remove('has');
-    $('#m-'+side+'-label').textContent = 'Bild hinzufügen';
-    $('#m-'+side+'-rm').style.display = 'none';
   },
   saveCard: function(next){
     var q = $('#m-q').value.trim(), a = $('#m-a').value.trim(), err = $('#m-err'), f = Model.folder(view.id);
@@ -682,13 +661,12 @@ var Modals = {
       (q ? $('#m-a') : $('#m-q')).focus(); return;
     }
     if(modalCtx && modalCtx.cardId){
-      var c = f.cards.find(function(x){return x.id===modalCtx.cardId;}); if(c){ c.q = q; c.a = a; c.qImg = modalCtx.qImg||null; c.aImg = modalCtx.aImg||null; }
+      var c = f.cards.find(function(x){return x.id===modalCtx.cardId;}); if(c){ c.q = q; c.a = a; }
       Modals.close();
     }else{
-      f.cards.push({id:uid(), q:q, a:a, s:null, qImg:modalCtx.qImg||null, aImg:modalCtx.aImg||null});
+      f.cards.push({id:uid(), q:q, a:a, s:null});
       if(next){
         $('#m-q').value = ''; $('#m-a').value = ''; err.textContent = ''; $('#m-q').focus();
-        Modals.removeImg('qImg'); Modals.removeImg('aImg');
         toast('Karte gespeichert, '+plural(f.cards.length,'Karte','Karten')+' im Ordner');
       }else Modals.close();
     }
@@ -705,7 +683,7 @@ var Modals = {
   backup: function(){
     modalCtx = {type:'backup', armed:false};
     Modals.open(Modals.head('Sicherung und Übertragung')
-      +'<p>Deine Karten liegen nur in diesem Browser. Kopiere den Text, um sie zu sichern oder auf ein anderes Gerät zu bringen. Bilder sind enthalten, der Text kann dadurch sehr lang werden.</p>'
+      +'<p>Deine Karten liegen nur in diesem Browser. Kopiere den Text, um sie zu sichern oder auf ein anderes Gerät zu bringen.</p>'
       +'<textarea id="m-export" rows="4" readonly aria-label="Sicherungstext"></textarea>'
       +'<div class="sheet-actions" style="margin-top:10px"><button class="btn" data-m="copy">Text kopieren</button></div>'
       +'<hr><p>Sicherungstext einfügen. Das ersetzt alle Ordner auf diesem Gerät.</p>'
@@ -739,13 +717,16 @@ var Actions = {
   'home':         function(){ App.go({name:'home'}); },
   'open-folder':  function(el){ App.go({name:'folder', id:el.dataset.id}); },
   'back-folder':  function(){ App.go({name:'folder', id:view.id}); },
+  'up':           function(){ var f = Model.folder(view.id); App.go(f && f.parent ? {name:'folder', id:f.parent} : {name:'home'}); },
   'new-folder':   function(){ Modals.folder(); },
+  'new-sub':      function(){ Modals.folder(view.id); },
   'backup':       function(){ Modals.backup(); },
   'del-folder': function(el){
     var f = Model.folder(el.dataset.id); if(!f) return;
-    Modals.confirm('Ordner löschen?', '„'+f.name+'“ und '+plural(f.cards.length,'Karte','Karten')+' werden gelöscht. Das lässt sich nicht rückgängig machen.', 'Ordner löschen', function(){
-      state.folders = state.folders.filter(function(x){return x.id!==f.id;});
-      if(state.session && state.session.folderId===f.id) state.session = null;
+    Modals.confirm('Ordner löschen?', '„'+f.name+'“ und '+plural(Model.cardsOf(f.id).length,'Karte','Karten')+(Model.kids(f.id).length?' samt allen Unterordnern':'')+' werden gelöscht. Das lässt sich nicht rückgängig machen.', 'Ordner löschen', function(){
+      var t = Model.tree(f.id);
+      state.folders = state.folders.filter(function(x){return t.indexOf(x.id)<0;});
+      Model.sanitizeSession();
       Store.save(); App.render(); toast('Ordner gelöscht');
     });
   },
@@ -761,14 +742,23 @@ var Actions = {
   'reset-status': function(){
     var f = Model.folder(view.id); if(!f) return;
     Modals.confirm('Status zurücksetzen?', 'Alle Karten in „'+f.name+'“ gelten danach wieder als nicht geprüft.', 'Zurücksetzen', function(){
-      f.cards.forEach(function(c){c.s = null;}); Store.save(); App.render(); toast('Status zurückgesetzt');
+      Model.cardsOf(f.id).forEach(function(c){c.s = null;}); Store.save(); App.render(); toast('Status zurückgesetzt');
     });
   },
   'setup': function(){
-    var f = Model.folder(view.id); if(!f || !f.cards.length) return;
+    var f = Model.folder(view.id); if(!f || !Model.cardsOf(f.id).length) return;
+    view.sel = Model.tree(f.id);   // zu Beginn sind alle Ordner angehakt
     if(!Model.pool(f,state.prefs.pool).length) state.prefs.pool = 'all';
-    App.go({name:'setup', id:f.id});
+    App.go({name:'setup', id:f.id, sel:view.sel});
   },
+  'tog': function(el){
+    var id = el.dataset.id, on = view.sel.indexOf(id)>-1, t = Model.tree(id);
+    view.sel = view.sel.filter(function(x){return t.indexOf(x)<0;});
+    if(!on) view.sel = view.sel.concat(t);   // Ordner und seine Unterordner zusammen umschalten
+    Setup.updateCount(); App.render();
+  },
+  'sel-all':  function(){ view.sel = Model.tree(view.id); App.render(); },
+  'sel-none': function(){ view.sel = []; App.render(); },
   'pool': function(el){ state.prefs.pool = el.dataset.p; Store.save(); App.render(); },
   'dir':  function(el){ state.prefs.dir = el.dataset.d; Store.save(); App.render(); },
   'step': function(el){
@@ -801,10 +791,10 @@ var Actions = {
   },
   'retest': function(el){
     var s = state.session, f = Model.folder(s.folderId); if(!f){ App.go({name:'home'}); return; }
-    var k = el.dataset.f;
+    var k = el.dataset.f, all = Model.cardsOf(f.id);
     var ids = s.ids.filter(function(id){
       var r = s.res[id]; if(!r) return false;
-      if(!f.cards.some(function(c){return c.id===id;})) return false;
+      if(!all.some(function(c){return c.id===id;})) return false;
       if(k==='alle') return true;
       if(k==='schwach') return r.s==='mittel' || r.s==='falsch';
       return r.s===k;
@@ -835,7 +825,6 @@ mroot.addEventListener('click', function(e){
   else if(m==='save-folder') Modals.saveFolder();
   else if(m==='save-card') Modals.saveCard(false);
   else if(m==='save-card-next') Modals.saveCard(true);
-  else if(m==='rm-img') Modals.removeImg(el.dataset.side);
   else if(m==='yes'){ var fn = modalCtx && modalCtx.onYes; Modals.close(); if(fn) fn(); }
   else if(m==='copy') Modals.copyText();
   else if(m==='import') Modals.importBackup();
